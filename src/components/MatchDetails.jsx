@@ -2,12 +2,21 @@ import React, { useState } from 'react';
 import { ArrowLeft, Star, TrendingUp, Users, Lock, Zap, Target } from 'lucide-react';
 import PaymentButton from './PaymentButton';
 import CommunityGraph from './CommunityGraph';
+import StreakAnalysis from './StreakAnalysis';
 
 const MatchDetails = ({ match, onBack, hasPaidInsight, onInsightPurchased }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [paidFeatures, setPaidFeatures] = useState(new Set());
 
   const handlePaymentSuccess = () => {
     onInsightPurchased(match.match_id);
+  };
+
+  const handleFeaturePurchase = (featureType) => {
+    setPaidFeatures(prev => new Set([...prev, featureType]));
+    if (featureType === 'match_insight') {
+      onInsightPurchased(match.match_id);
+    }
   };
 
   const formatDateTime = (datetime) => {
@@ -187,6 +196,16 @@ const MatchDetails = ({ match, onBack, hasPaidInsight, onInsightPurchased }) => 
                   </div>
                 </div>
               </div>
+            </div>
+
+            {/* Streak Analysis Section */}
+            <div className="mt-8">
+              <StreakAnalysis
+                match={match}
+                userId="current_user" // This would come from auth context
+                onPurchase={handleFeaturePurchase}
+                hasPurchased={paidFeatures.has('streak_analysis')}
+              />
             </div>
           </div>
         )}
